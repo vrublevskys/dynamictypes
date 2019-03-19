@@ -8,6 +8,7 @@ import com.razersoft.dynamictypes.data.types.TypeConverter
 import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.relation.ToOne
 
 /**
  * Created by sergey.vrublevsky on 3/19/19
@@ -18,10 +19,11 @@ data class Message<T : BasePayload>(
     @Id
     var id: Long,
     @Convert(converter = TypeConverter::class, dbType = String::class)
-    val messageType: MessageType<T>,
-    val mainPayload: MainPayload) : WithPayload<T> by messageType {
+    val messageType: MessageType) : WithPayload<T> {
 
-    fun getPayload(): T {
-        return getPayload(mainPayload)
+    lateinit var payload: ToOne<MainPayload>
+
+    override fun getPayload(): T {
+        return payload.target as T
     }
 }
